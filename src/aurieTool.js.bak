@@ -1,6 +1,5 @@
 import { getRequestAuth } from './requestContext.js';
 import { callAuraAsk, bearerFromHeader, decodeOurJwt } from './auraDialogue.js';
-import { setWidgetSession } from './widgetSessionStore.js';
 
 const baseInputSchema = {
   type: 'object',
@@ -17,9 +16,22 @@ const baseInputSchema = {
           '- "I need grounding right now."',
         ].join('\n'),
     },
+    conversationId: {
+      type: 'string',
+      description:
+        'Optional. Pass the conversationId from the previous tool result so this message continues the same conversation (up to 10 user messages).',
+    },
+    dialogueId: {
+      type: 'string',
+      description:
+        'Optional. Pass the dialogueId from the previous tool result when continuing a conversation.',
+    },
   },
   required: ['text'],
 };
+
+const MAX_USER_MESSAGES = 10;
+const conversationMessageCount = new Map();
 
 export const aurieQuickProcessTool = {
   name: 'aurie.quick_process',
@@ -48,34 +60,53 @@ export const aurieQuickProcessTool = {
     'Important: pass the user message through as `text` exactly as written.',
   ].join('\n'),
   inputSchema: baseInputSchema,
-  handler: async (args, context = {}) => {
+  handler: async (args) => {
     const userMessage = typeof args?.text === 'string' ? args.text : '';
+    const conversationId = typeof args?.conversationId === 'string' ? args.conversationId : null;
+    const dialogueId = typeof args?.dialogueId === 'string' ? args.dialogueId : null;
     const authorization = getRequestAuth();
     const rawToken = bearerFromHeader(authorization);
     const ourJwt = rawToken ? decodeOurJwt(rawToken) : null;
     const accessToken = ourJwt?.aura_token || rawToken;
 
-    if (accessToken) {
-      const result = await callAuraAsk({
-        message: userMessage,
-        accessToken,
-      });
+    if (!accessToken) {
+      return {
+        response:
+          'Connect your Aurie account to use Quick Processing here. In ChatGPT, add this app and choose "OAuth" to link your account.',
+        initial_text: userMessage,
+        first_reply: null,
+        connect_required: true,
+      };
+    }
+
+    if (conversationId) {
+      const count = (conversationMessageCount.get(conversationId) ?? 0) + 1;
+      if (count > MAX_USER_MESSAGES) {
+        return {
+          response: `This Quick Processing conversation has reached the maximum of ${MAX_USER_MESSAGES} messages. Start a new message to begin a fresh conversation.`,
+          initial_text: userMessage,
+          first_reply: null,
+          conversationId,
+          dialogueId,
+          connect_required: false,
+          message_limit_reached: true,
+        };
+      }
+      conversationMessageCount.set(conversationId, count);
+    }
+
+    const result = await callAuraAsk({
+      message: userMessage,
+      conversationId,
+      accessToken,
+    });
       if (result.success) {
-        const widgetSessionId = context.widgetSessionId;
-        if (widgetSessionId) {
-          setWidgetSession(widgetSessionId, {
-            conversationId: result.conversationId,
-            dialogueId: result.dialogueId,
-            accessToken,
-          });
-          console.log('[aurie tool] stored widget session:', { widgetSessionId, conversationId: result.conversationId });
-        }
         return {
           response: result.message || 'Here’s a moment of grounding.',
           initial_text: userMessage,
           first_reply: result.message,
-          conversationId: result.conversationId,
-          dialogueId: result.dialogueId,
+          conversationId: (result.conversationId ?? conversationId),
+          dialogueId: (result.dialogueId ?? dialogueId),
           connect_required: false,
         };
       }

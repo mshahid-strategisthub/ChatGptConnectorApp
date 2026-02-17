@@ -10,15 +10,17 @@ export default function App() {
   const {
     assetBase,
     route,
-    step,
-    answers,
-    draft,
-    isSending,
-    visible,
-    setDraft,
-    back,
-    send,
+    initial_text,
+    first_reply,
+    connect_required,
+    messages,
+    canEnd,
     end,
+    visible,
+    draft,
+    setDraft,
+    isSending,
+    send,
   } = useStepFlow();
 
   return (
@@ -37,34 +39,33 @@ export default function App() {
       <div className="relative z-10 h-full flex flex-col">
         <HeaderBar
           canBack={visible.canBack && route === "step"}
-          disabled={isSending}
-          onBack={back}
+          disabled={false}
+          onBack={() => {}}
         />
 
         {route === "success" ? (
           <SuccessScreen />
         ) : (
           <>
-            <ChatStep
-              assistantText={visible.assistant}
-              userText={visible.user}
-              step={step}
-              assetBase={assetBase}
-            />
+            <ChatStep messages={messages} assetBase={assetBase} />
 
-            <Composer
-              draft={draft}
-              setDraft={setDraft}
-              isSending={isSending}
-              canEnd={visible.isFinal && !!answers[4]}
-              onSend={send}
-              onEnd={end}
-            />
+            {connect_required ? (
+              <div className="px-4 pb-4 text-center text-white/80 text-sm">
+                Link your account in ChatGPT settings to continue.
+              </div>
+            ) : (
+              <Composer
+                draft={draft}
+                setDraft={setDraft}
+                isSending={isSending}
+                canEnd={canEnd}
+                onSend={send}
+                onEnd={end}
+              />
+            )}
           </>
         )}
       </div>
     </div>
   );
 }
-
-

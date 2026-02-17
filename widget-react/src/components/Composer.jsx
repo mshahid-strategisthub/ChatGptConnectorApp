@@ -27,7 +27,7 @@ export default function Composer({
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  onSend();
+                  onSend(draft);
                 }
               }}
               placeholder="Type your response…"
@@ -36,7 +36,7 @@ export default function Composer({
             />
             <button
               type="button"
-              onClick={onSend}
+              onClick={() => onSend(draft)}
               disabled={isSending || !draft.trim()}
               className={`rounded-2xl px-4 py-3 text-[13px] font-semibold transition ${
                 isSending || !draft.trim()
