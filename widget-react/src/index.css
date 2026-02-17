@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sceneSkyA: #0b1020;
+  --sceneSkyB: #1b2a5b;
+  --sunColor: #ffd27d;
+  --sunGlow: rgba(255, 210, 125, 0.55);
+  --sunY: 65%;
+  --sceneOpacity: 0.45;   
+  --sunOpacity: 0.95;  
+  --raysOpacity: 0.22;
+}
+
+.aurie-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurie-sky {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    1200px 700px at 50% 18%,
+    color-mix(in srgb, var(--sceneSkyB) 55%, transparent),
+    color-mix(in srgb, var(--sceneSkyA) 45%, transparent)
+  );
+  opacity: var(--sceneOpacity);
+  mix-blend-mode: overlay;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.75) 40%, rgba(0,0,0,0) 78%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.75) 40%, rgba(0,0,0,0) 78%);
+}
+
+.aurie-rays {
+  position: absolute;
+  left: 50%;
+  top: var(--sunY);
+  width: 900px;
+  height: 900px;
+  transform: translate(-50%, -50%);
+  opacity: var(--raysOpacity);
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,0.0) 0 24%, rgba(255,255,255,0.55) 28%, rgba(255,255,255,0.0) 40%),
+    conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0.0) 0deg,
+      rgba(255, 255, 255, 0.32) 12deg,
+      rgba(255, 255, 255, 0.0) 24deg,
+      rgba(255, 255, 255, 0.26) 40deg,
+      rgba(255, 255, 255, 0.0) 56deg,
+      rgba(255, 255, 255, 0.22) 72deg,
+      rgba(255, 255, 255, 0.0) 88deg,
+      rgba(255, 255, 255, 0.18) 104deg,
+      rgba(255, 255, 255, 0.0) 120deg,
+      rgba(255, 255, 255, 0.14) 136deg,
+      rgba(255, 255, 255, 0.0) 152deg,
+      rgba(255, 255, 255, 0.12) 168deg,
+      rgba(255, 255, 255, 0.0) 184deg,
+      rgba(255, 255, 255, 0.10) 200deg,
+      rgba(255, 255, 255, 0.0) 216deg,
+      rgba(255, 255, 255, 0.09) 232deg,
+      rgba(255, 255, 255, 0.0) 248deg,
+      rgba(255, 255, 255, 0.08) 264deg,
+      rgba(255, 255, 255, 0.0) 280deg,
+      rgba(255, 255, 255, 0.07) 296deg,
+      rgba(255, 255, 255, 0.0) 312deg,
+      rgba(255, 255, 255, 0.06) 328deg,
+      rgba(255, 255, 255, 0.0) 360deg
+    );
+  border-radius: 9999px;
+  filter: blur(0.6px);
+  pointer-events: none;
+}
+
+.aurie-sun {
+  position: absolute;
+  left: 50%;
+  top: var(--sunY);
+  width: 220px;
+  height: 220px;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--sunColor));
+  box-shadow:
+    0 0 40px var(--sunGlow),
+    0 0 120px rgba(255, 210, 125, 0.25);
+  filter: saturate(1.05);
+  opacity: var(--sunOpacity);
+  mix-blend-mode: screen;
+}
+
+

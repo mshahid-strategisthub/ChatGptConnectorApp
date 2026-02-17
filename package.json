@@ -1,0 +1,30 @@
+{
+  "name": "aura-mcp-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MCP server for Aura ChatGPT app integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "widget:build": "vite build --config vite.widget.config.mjs",
+    "widget:dev": "vite --config vite.widget.config.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "tailwindcss": "^3.4.17",
+    "vite": "^5.4.20"
+  }
+}
+
