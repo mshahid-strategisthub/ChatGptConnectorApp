@@ -20,3 +20,5 @@
 4. **Connect in ChatGPT**
    - Run a Cloudflare tunnel pointing to your app.
    - In ChatGPT, use the tunnel URL with `/mcp` (e.g. `https://your-tunnel-url/mcp`) to connect the app.
+   - cloudflared tunnel --url http://localhost:8000
+   - Then add generated url to env and restart app by npm run dev
